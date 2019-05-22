@@ -24,3 +24,4 @@ df_empl <- merge.data.frame(df_empl, Armstrong_empl, by.x = 'industry_code')
 
 Employ_all <- Reduce(merge(x = naics, y = df$Allegheny, by = naics$industry_code), list(df$Armstrong$annual_avg_emplvl))
 
+# 
