@@ -18,11 +18,9 @@ Allegheny_empl <- subset(as.data.frame(df$Allegheny), select = c(industry_code, 
 
 Armstrong_empl <- subset(as.data.frame(df$Armstrong), select = c(industry_code, annual_avg_emplvl))
 
-                         
 df_empl <- merge.data.frame(naics, Allegheny_empl, by.x = "industry_code")
 
 df_empl <- merge.data.frame(df_empl, Armstrong_empl, by.x = 'industry_code')
 
-reduce(merge( list()))
+Employ_all <- Reduce(merge(x = naics, y = df$Allegheny, by = naics$industry_code), list(df$Armstrong$annual_avg_emplvl))
 
-#Reduce & Merge Combo for multiple dataframes or list of dataframes 
