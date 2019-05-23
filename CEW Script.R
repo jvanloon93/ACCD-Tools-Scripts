@@ -18,10 +18,10 @@ Allegheny_empl <- subset(as.data.frame(df$Allegheny), select = c(industry_code, 
 
 Armstrong_empl <- subset(as.data.frame(df$Armstrong), select = c(industry_code, annual_avg_emplvl))
 
-df_empl <- merge.data.frame(naics, Allegheny_empl, by.x = "industry_code")
+df_empl_1 <- merge.data.frame(naics, Allegheny_empl, by.x = "industry_code")
 
-df_empl <- merge.data.frame(df_empl, Armstrong_empl, by.x = 'industry_code')
+df_empl_2 <- merge.data.frame(df_empl_1, Armstrong_empl)
 
 Employ_all <- Reduce(merge(x = naics, y = df$Allegheny, by = naics$industry_code), list(df$Armstrong$annual_avg_emplvl))
 
-# 
+# Goal - Data frame with totals of Annual Employment, Annual Establishments, and Avg Annual wages across ten countys. 
