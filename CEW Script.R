@@ -14,14 +14,38 @@ colnames(df) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Green
 
 naics <- blscrapeR::niacs
 
-Allegheny_empl <- subset(as.data.frame(df$Allegheny), select = c(industry_code, annual_avg_emplvl))
+Allegheny <- as.data.frame(df$Allegheny) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
+  rename(Allegheny_Employment = annual_avg_emplvl , Allegheny_Establishments = annual_avg_estabs, Allegheny_AvgAnn_Wage = avg_annual_pay)
 
-Armstrong_empl <- subset(as.data.frame(df$Armstrong), select = c(industry_code, annual_avg_emplvl))
+Armstrong <- as.data.frame(df$Armstrong) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
 
-df_empl_1 <- merge.data.frame(naics, Allegheny_empl, by.x = "industry_code")
+Beaver <- as.data.frame(df$Beaver) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
 
-df_empl_2 <- merge.data.frame(df_empl_1, Armstrong_empl)
+Butler <- as.data.frame(df$Butler) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
 
-Employ_all <- Reduce(merge(x = naics, y = df$Allegheny, by = naics$industry_code), list(df$Armstrong$annual_avg_emplvl))
+Fayette <- as.data.frame(df$Fayette) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
+
+Greene <- as.data.frame(df$Greene) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
+
+Indiana <- as.data.frame(df$Indiana) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
+
+Lawrence <- as.data.frame(df$Lawrence) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
+
+Washington <- as.data.frame(df$Washington) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
+
+Westmoreland <- as.data.frame(df$Westmoreland) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)
+
+qcew_api(year = 2017, qtr = 'a', slice = "area", sliceCode = 6280)
+
 
 # Goal - Data frame with totals of Annual Employment, Annual Establishments, and Avg Annual wages across ten countys. 
