@@ -19,57 +19,75 @@ naics <- blscrapeR::niacs
 Allegheny <- as.data.frame(df$Allegheny) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Allegheny_Employment = annual_avg_emplvl , Allegheny_Establishments = annual_avg_estabs, Allegheny_AvgAnn_Wage = avg_annual_pay)
 
 Armstrong <- as.data.frame(df$Armstrong) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Armstrong_Employment = annual_avg_emplvl , Armstrong_Establishments = annual_avg_estabs, Armstrong_AvgAnn_Wage = avg_annual_pay)
 
 Beaver <- as.data.frame(df$Beaver) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Beaver_Employment = annual_avg_emplvl , Beaver_Establishments = annual_avg_estabs, Beaver_AvgAnn_Wage = avg_annual_pay)
 
 Butler <- as.data.frame(df$Butler) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Butler_Employment = annual_avg_emplvl , Butler_Establishments = annual_avg_estabs, Butler_AvgAnn_Wage = avg_annual_pay)
 
 Fayette <- as.data.frame(df$Fayette) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay)%>% 
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Fayette_Employment = annual_avg_emplvl , Fayette_Establishments = annual_avg_estabs, Fayette_AvgAnn_Wage = avg_annual_pay)
 
 Greene <- as.data.frame(df$Greene) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Greene_Employment = annual_avg_emplvl , Greene_Establishments = annual_avg_estabs, Greene_AvgAnn_Wage = avg_annual_pay)
 
 Indiana <- as.data.frame(df$Indiana) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Indiana_Employment = annual_avg_emplvl, Indiana_Establishments = annual_avg_estabs, Indiana_AvgAnn_Wage = avg_annual_pay)
 
 Lawrence <- as.data.frame(df$Lawrence) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Lawrence_Employment = annual_avg_emplvl , Lawrence_Establishments = annual_avg_estabs, Lawrence_AvgAnn_Wage = avg_annual_pay)
 
 Washington <- as.data.frame(df$Washington) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Washington_Employment = annual_avg_emplvl , Washington_Establishments = annual_avg_estabs, Washington_AvgAnn_Wage = avg_annual_pay)
 
 Westmoreland <- as.data.frame(df$Westmoreland) %>%
   select(industry_code, own_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   filter(own_code == 5) %>%
+  select(industry_code, annual_avg_emplvl, annual_avg_estabs, avg_annual_pay) %>%
   rename(Westmoreland_Employment = annual_avg_emplvl , Westmoreland_Establishments = annual_avg_estabs, Westmoreland_AvgAnn_Wage = avg_annual_pay)
 
-
-naics_1 <- merge(naics, Allegheny)
-naics_2 <- merge(naics_1, Armstrong, by = 'industry_code')
-
 df_clean <- Reduce(function(x,y) merge(x,y, by = "industry_code"), list(naics, Allegheny, Armstrong, Beaver, Butler, Fayette, Greene, Indiana, Lawrence, Washington, Westmoreland))
+
+df_17 <- df_clean %>% 
+  mutate(Employment_total = rowSums(data[3,6,9,12,15,18,21,24,27,30]))
+
+           rowSums(Allegheny_Employment, Armstrong_Employment, Beaver_Employment, Butler_Employment, Fayette_Employment, Greene_Employment, Indiana_Employment, Lawrence_Employment, Washington_Employment, Westmoreland_Employment))
+         
+         
+         Establishment_total = rowSums(Allegheny_Establishments, Armstrong_Establishments, Beaver_Establishments, Butler_Establishments, Fayette_Establishments, Greene_Establishments, Indiana_Establishments, Lawrence_Establishments, Washington_Establishments, Washington_Establishments), 
+         Annual_Average_Wage = rowSums(Allegheny_AvgAnn_Wage, Armstrong_AvgAnn_Wage, Beaver_AvgAnn_Wage, Butler_AvgAnn_Wage, Fayette_AvgAnn_Wage, Greene_AvgAnn_Wage, Indiana_AvgAnn_Wage, Lawrence_AvgAnn_Wage, Washington_AvgAnn_Wage, Westmoreland_AvgAnn_Wage)/Employment_total)
+ 
+df_17 <- df_clean %>% 
+  mutate(Employment_Total = rowsum())
 
 # Goal - Data frame with totals of Annual Employment, Annual Establishments, and Avg Annual wages across ten countys. 
