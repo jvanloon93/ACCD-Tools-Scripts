@@ -4,11 +4,14 @@ library(dplyr)
 library(ggplot2)
 library(usmap)
 
+
+PRA_CEW <- function(year) {
+
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
 
 names(ten_county) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')
 
-df<- as.data.frame(sapply(seq_along(ten_county), function(i) qcew_api(year = 2017, qtr = 'a', slice = 'area', ten_county[i])))
+df<- as.data.frame(sapply(seq_along(ten_county), function(i) qcew_api(year = year , qtr = 'a', slice = 'area', ten_county[i])))
 
 colnames(df) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')
 
@@ -78,16 +81,17 @@ Westmoreland <- as.data.frame(df$Westmoreland) %>%
 
 df_clean <- Reduce(function(x,y) merge(x,y, by = "industry_code"), list(naics, Allegheny, Armstrong, Beaver, Butler, Fayette, Greene, Indiana, Lawrence, Washington, Westmoreland))
 
-df_17 <- df_clean %>% 
-  mutate(Employment_total = rowSums(data[3,6,9,12,15,18,21,24,27,30]))
+df_clean <- df_clean %>% 
+  mutate(Employment_total = Allegheny_Employment + Armstrong_Employment + Beaver_Employment + Butler_Employment + Fayette_Employment + Greene_Employment + Indiana_Employment + Lawrence_Employment + Washington_Employment + Westmoreland_Employment, 
+         Establishment_total = Allegheny_Establishments + Armstrong_Establishments + Beaver_Establishments + Butler_Establishments + Fayette_Establishments + Greene_Establishments + Indiana_Establishments + Lawrence_Establishments + Washington_Establishments + Washington_Establishments) 
+         
+return(df_clean)
 
-           rowSums(Allegheny_Employment, Armstrong_Employment, Beaver_Employment, Butler_Employment, Fayette_Employment, Greene_Employment, Indiana_Employment, Lawrence_Employment, Washington_Employment, Westmoreland_Employment))
-         
-         
-         Establishment_total = rowSums(Allegheny_Establishments, Armstrong_Establishments, Beaver_Establishments, Butler_Establishments, Fayette_Establishments, Greene_Establishments, Indiana_Establishments, Lawrence_Establishments, Washington_Establishments, Washington_Establishments), 
-         Annual_Average_Wage = rowSums(Allegheny_AvgAnn_Wage, Armstrong_AvgAnn_Wage, Beaver_AvgAnn_Wage, Butler_AvgAnn_Wage, Fayette_AvgAnn_Wage, Greene_AvgAnn_Wage, Indiana_AvgAnn_Wage, Lawrence_AvgAnn_Wage, Washington_AvgAnn_Wage, Westmoreland_AvgAnn_Wage)/Employment_total)
- 
-df_17 <- df_clean %>% 
-  mutate(Employment_Total = rowsum())
+}
+
+        
+# Annual_Average_Wage = ((Allegheny_AvgAnn_Wage * Allegheny_Employment) + (Armstrong_AvgAnn_Wage * Armstrong_Employment) + (Beaver_AvgAnn_Wage * Beaver_Employment)  + (Butler_AvgAnn_Wage * Butler_Employment) + (Fayette_AvgAnn_Wage * Fayette_Employment)
+      # + (Greene_AvgAnn_Wage * Greene_Employment) + (Indiana_AvgAnn_Wage * Indiana-Employment) + (Lawrence_AvgAnn_Wage * Lawrence_Employment) + (Washington_AvgAnn_Wage * Washington_Employment) + (Westmoreland_AvgAnn_Wage * Westmoreland_Employment)/Employment_total))
+
 
 # Goal - Data frame with totals of Annual Employment, Annual Establishments, and Avg Annual wages across ten countys. 
