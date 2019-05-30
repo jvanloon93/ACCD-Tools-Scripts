@@ -89,9 +89,7 @@ return(df_clean)
 
 }
 
+ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
+
+
         
-# Annual_Average_Wage = ((Allegheny_AvgAnn_Wage * Allegheny_Employment) + (Armstrong_AvgAnn_Wage * Armstrong_Employment) + (Beaver_AvgAnn_Wage * Beaver_Employment)  + (Butler_AvgAnn_Wage * Butler_Employment) + (Fayette_AvgAnn_Wage * Fayette_Employment)
-      # + (Greene_AvgAnn_Wage * Greene_Employment) + (Indiana_AvgAnn_Wage * Indiana-Employment) + (Lawrence_AvgAnn_Wage * Lawrence_Employment) + (Washington_AvgAnn_Wage * Washington_Employment) + (Westmoreland_AvgAnn_Wage * Westmoreland_Employment)/Employment_total))
-
-
-# Goal - Data frame with totals of Annual Employment, Annual Establishments, and Avg Annual wages across ten countys. 
