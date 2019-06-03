@@ -11,3 +11,9 @@ time_frame <- c(2007:2017)
 df_17 <- PRA_CEW_Tall(2017)
 df_16 <- PRA_CEW_Tall(2016)
 df <- as.data.frame(lapply(time_frame, PRA_CEW_Tall))
+
+for (___ in ___) {
+  for (___ in ___) {
+    print("In 'county' the 'var' is 'x' in 'industry' in 'year')
+  }
+}
