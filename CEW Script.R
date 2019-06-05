@@ -6,19 +6,20 @@ library(usmap)
 
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
 
-time_frame <- c(2007:2017)
+df<- PRA_CEW_Tall_Data(2018)
 
-df_17 <- PRA_CEW_Tall(2017)
-df_16 <- PRA_CEW_Tall(2016)
-df <- as.data.frame(lapply(time_frame, PRA_CEW_Tall))
+total_industry <- df %>%
+  filter(industry_code == 10) %>%
+  mutate(average_wage = total_annual_wages / annual_avg_emplvl)
 
 
-#On principal, won't write in ten dfs.
+ggplot(total_industry, aes(x = Geography, y =  annual_avg_emplvl)) + geom_col() 
 
-#for loop reporting idea
-for (___ in ___) {
-  for (___ in ___) {
-    print("In 'county' the 'var' is 'x' in 'industry' in 'year')
-  }
-}
+ggplot(total_industry, aes(x = Geography, y =  annual_avg_estabs)) + geom_col() 
+
+ggplot(total_industry, aes(x = Geography, y =  average_wage)) + geom_col() 
+
+
+  
+
 
