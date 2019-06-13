@@ -10,7 +10,7 @@ PRA_CEW_Tall <- function(year) {
   
   names(ten_county) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')
   
-  df<- as.data.frame(sapply(seq_along(ten_county), function(i) qcew_api(year = year , qtr = 'a', slice = 'area', ten_county[i])))
+  df<- as.data.frame(sapply(seq_along(ten_county), function(i) qcew_api(year = year, qtr = 'a', slice = 'area', ten_county[i])))
   
   colnames(df) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')
   
