@@ -6,17 +6,14 @@ library(usmap)
 
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
 
-
-<<<<<<< HEAD
 df <- df %>%
   mutate(average_wage = total_annual_wages / annual_avg_emplvl)
 
 total_industry <- df %>%
-=======
+
 d18<- PRA_CEW_Tall(2018)
 
 total_industry <- d18 %>%
->>>>>>> b738ba32b99fefe607adec78c31939ee032400e6
   filter(industry_code == 10) %>%
   mutate(average_wage = total_annual_wages / annual_avg_emplvl)
 
