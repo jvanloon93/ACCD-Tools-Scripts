@@ -5,9 +5,9 @@ library(usmap)
 
 ten_county_USA <- as.vector(c(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')), 'US000'))
 
-Employment_Code <- as.vector(sapply(seq_along(ten_county_USA), function(i) (paste('ENU', ten_county[i],'10010', sep = ""))))
+Employment_Code <- as.vector(sapply(seq_along(ten_county_USA), function(i) (paste('ENU', ten_county_USA[i],'10010', sep = ""))))
 
-Total_Wage_Codes <- as.vector(sapply(seq_along(ten_county_USA), function(i) (paste('ENU', ten_county[i],'30010', sep = ""))))
+Total_Wage_Codes <- as.vector(sapply(seq_along(ten_county_USA), function(i) (paste('ENU', ten_county_USA[i],'30010', sep = ""))))
 
 lst_Employment <- lapply(seq_along(Employment_Code), function(i) bls_api(Employment_Code[i]))
 
