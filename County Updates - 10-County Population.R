@@ -14,12 +14,14 @@ ten_county_name <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Gr
 v17<- load_variables(2017, "acs1")
 
 pop <- bind_rows(lapply(seq_along(ten_county_name), function(i) get_acs(geography = 'county', variables = "B01001_001", state = "PA", county = ten_county_name[i], geometry = FALSE)))
-
 colnames(pop) <- c("GEOID", "County", "variable", "Total_Population", "Margin of Error" )
-
 ggplot(pop, aes(x = County, y = Total_Population))+ geom_col() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 LaborForce <- bind_rows(lapply(seq_along(ten_county_name), function(i) get_acs(geography = 'county', variables = "B10058_002", state = "PA", county = ten_county_name[i], geometry = FALSE)))
+
+pop2 <- bind_rows(lapply(seq_along(ten_county_name), function(i) get_acs(geography = 'county', variables = "B01003_001", state = "PA", county = ten_county_name[i], geometry = FALSE)))
+colnames(pop2) <- c("GEOID", "County", "variable", "Total_Population", "Margin of Error" )
+ggplot(pop2, aes(x = County, y = Total_Population))+ geom_col() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 v17concept <- v17 %>%
   count(concept)
