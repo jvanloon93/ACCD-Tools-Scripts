@@ -4,40 +4,15 @@ library(dplyr)
 library(ggplot2)
 library(usmap)
 
+
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
+  
+names(ten_county) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')
+  
+df<- bind_rows(lapply(seq_along(ten_county), function(i) qcew_api(year = 2018 , qtr = 'a', slice = 'area', ten_county[i])))
+  
+df<- bind_rows(lapply(seq_along(ten_county), function(i) qcew_api(year = 2018 , qtr = 'a', slice = 'area', 38300)))
 
-df <- df %>%
-  mutate(average_wage = total_annual_wages / annual_avg_emplvl)
+MSA <- qcew_api(year = 2017, qtr = "a", slice = "area", sliceCode = 38300)
 
-total_industry <- df %>%
-
-d18<- PRA_CEW_Tall(2018)
-
-total_industry <- d18 %>%
-  filter(industry_code == 10) %>%
-  mutate(average_wage = total_annual_wages / annual_avg_emplvl)
-
-d18$industry_code <- as.character(d18$industry_code)
-
-
-ggplot(total_industry, aes(x = Geography, y =  annual_avg_emplvl)) + geom_col() 
-
-ggplot(total_industry, aes(x = Geography, y =  annual_avg_estabs)) + geom_col() 
-
-ggplot(total_industry, aes(x = Geography, y =  average_wage)) + geom_col() 
-
-
-
-d18 <- d18 %>%
-mutate(if(grepl("^11", industry_code)) {Sector = "Agriculture, forestry, fishing and hunting"})
-
-
-d18 %>%
-  isTRUE(grepl("^11", industry_code))
-       
-       for(i in 1:nrow(d18)){
-  if (grepl("^11", d18$industry_code)) {
-    print(paste("Agriculture, forestry, fishing and hunting"))
-  }
-} 
-
+#Possible to combine all Counties? Or Pull MSAs? 
