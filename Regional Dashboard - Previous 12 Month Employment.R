@@ -77,5 +77,3 @@ rownames(df_fn)[12] <- "Region"
 (df_fn[12,4]/df_fn[12,3])*1000
 
 
-
-
