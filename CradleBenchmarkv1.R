@@ -1,4 +1,5 @@
 library(tidycensus)
+library(blscrapeR)
 library(tidyverse)
 library(ggplot2)
 library(usmap)
@@ -9,7 +10,7 @@ v17 <- load_variables(2017, "acs5")
 MSA_Pop <- get_acs(
   geography = "metropolitan statistical area/micropolitan statistical area", 
   variables = "B01001_001", 
-  year = 2018, 
+  year = 2017, 
   geometry = FALSE)
 
 
@@ -149,10 +150,87 @@ Pittsburgh_HigherED_18_to_44_Percent
 
 
 MSA_Fips <- c("4238300", "2941180")
+MSA_Fips_NoState <- c("3830", "41180")
 
-Unemployment_MSA_codes <- as.vector(sapply(seq_along(MSA_Fips), function(i) (paste('LAUMT', MSA_Fips[i],'0000000004', sep = ""))))
+LaborForce_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips), function(i) (paste('LAUMT', MSA_Fips[i],'00000006', sep = ""))))
 
-Unemployment <-bls_api(c(Unemployment_MSA_codes[1]))
+Pittsburgh_LaborForce <- bls_api(c(LaborForce_MSA_Codes[1]))
+
+St.Louis_LaborForce <- bls_api(c(LaborForce_MSA_Codes[2]))
+
+PITLF18 <- Pittsburgh_LaborForce %>%
+  filter(year == 2018) 
+
+PITLF18 <- mean(PITLF18$value)
+
+PITLF17 <- Pittsburgh_LaborForce %>%
+  filter(year == 2017)
+
+PITLF17 <- mean(PITLF17$value)
+
+STLLF18 <- St.Louis_LaborForce %>%
+  filter(year == 2018)
+
+STLLF18 <- mean(STLLF18$value)
+
+STLF17 <- St.Louis_LaborForce %>% 
+  filter(year == 2017)
+
+STLFL17 <- mean(STLF17$value)
+
+Unemployment_MSA_codes <- as.vector(sapply(seq_along(MSA_Fips), function(i) (paste('LAUMT', MSA_Fips[i],'00000004', sep = ""))))
+
+Pittsburgh_Unemployment <-bls_api(c(Unemployment_MSA_codes[1]))
+
+St.Louis_Unemployment <- bls_api(c(Unemployment_MSA_codes[2]))
+
+PITUN18 <- Pittsburgh_Unemployment %>%
+  filter(year == 2018)
+
+PITUN18 <- mean(PITUN18$value)
+
+PITUN17 <- Pittsburgh_Unemployment %>%
+  filter(year == 2017)
+
+PITUN17 <- mean(PITUN17$value)
+
+STLUN18 <- St.Louis_Unemployment %>%
+  filter(year == 2018)
+
+STLUN18 <- mean(STLUN18$value)
+
+STLUN17 <- St.Louis_Unemployment %>%
+  filter(year == 2017)
+
+STLUN17 <- mean(STLUN17$value)
+
+Employment_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'10010', sep = ""))))
+
+Total_Wage_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'30010', sep = ""))))
+
+Pittsburgh_Employment <- bls_api(c(Employment_MSA_Codes[1]))
+
+Pittsburgh_Total_Wages <- bls_api(c(Total_Wage_MSA_Codes[1]))
+
+St.Louis_Employment <- bls_api(c(Employment_MSA_Codes[2]))
+
+St.Louis_Total_Wages <- bls_api(c(Total_Wage_MSA_Codes[2]))
+
+EmploymentPTS_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'10554', sep = ""))))
+
+Total_WagPTSe_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'30554', sep = ""))))
+
+PITPTS_Employment <- bls_api(c(EmploymentPTS_MSA_Codes[1]))
+
+PITPTS_Total_wages <- bls_api(c(Total_WagPTSe_MSA_Codes[1]))
+
+STLPTS_Employment <- bls_api(c(EmploymentPTS_MSA_Codes[2]))
+
+STLPTS_Total_Wages <- bls_api(c(Total_WagPTSe_MSA_Codes[2]))
+
+
+
+
 
 
 
