@@ -1,5 +1,7 @@
+install.packages("bea.R")
 library(tidycensus)
 library(blscrapeR)
+library(bea.R)
 library(tidyverse)
 library(ggplot2)
 library(usmap)
@@ -95,7 +97,7 @@ Total_18_44 <- bind_rows(lapply(seq_along(Total_18_44_vars),
                                                 function(i) get_acs(
                                                   geography = "metropolitan statistical area/micropolitan statistical area", 
                                                   variables = Total_18_44_vars[i], 
-                                                  year = 2016, 
+                                                  year = 2017, 
                                                   geometry = FALSE)))
 St.Louis_18_to_44  <- Total_18_44 %>%
   subset(GEOID == 41180) 
@@ -110,7 +112,7 @@ HS_Education_18_to_44 <- bind_rows(lapply(seq_along(HS_Education_18_to_44_vars),
                                                   year = 2017, 
                                                   geometry = FALSE)))
 
-St.Louis_HS_ED_18_44  <- HS_Education_18_to_44 %>%
+St.Louis_HS_ED_18_to_44  <- HS_Education_18_to_44 %>%
   subset(GEOID == 41180) 
 
 Pittsburgh_HS_ED_18_to_44 <- HS_Education_18_to_44%>%
@@ -118,7 +120,7 @@ Pittsburgh_HS_ED_18_to_44 <- HS_Education_18_to_44%>%
 
 Pittsburgh_HS_Ed_18_to_44_Percent <- sum(Pittsburgh_HS_ED_18_to_44$estimate)/sum(Pittsburgh_18_to_44$estimate)
 
-St.Louis_HS_ED_18_to_44_Percent <- sum(St.Louis_18_to_44$estimate)/sum(St.Louis_18_to_44$estimate)
+St.Louis_HS_ED_18_to_44_Percent <- sum(St.Louis_HS_ED_18_to_44$estimate)/sum(St.Louis_18_to_44$estimate)
 
 Higher_Ed_18_to_44 <- bind_rows(lapply(seq_along(Higher_Ed_18_to_44_vars), 
                                                           function(i) get_acs(
@@ -148,9 +150,19 @@ Pittsburgh_HS_Ed_18_to_44_Percent
 
 Pittsburgh_HigherED_18_to_44_Percent
 
+St.Louis_Pop$estimate
+
+St.Louis_HS_Percent
+
+St.Louis_Higher_Ed_Percent
+
+St.Louis_HS_ED_18_to_44_Percent
+
+St.Louis_HigherED_18_to_44_Percent
 
 MSA_Fips <- c("4238300", "2941180")
 MSA_Fips_NoState <- c("3830", "41180")
+
 
 LaborForce_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips), function(i) (paste('LAUMT', MSA_Fips[i],'00000006', sep = ""))))
 
@@ -228,9 +240,50 @@ STLPTS_Employment <- bls_api(c(EmploymentPTS_MSA_Codes[2]))
 
 STLPTS_Total_Wages <- bls_api(c(Total_WagPTSe_MSA_Codes[2]))
 
+PITLF18
+PITLF17
+(PITLF18-PITLF17)/PITLF17
+
+STLLF18
+STLFL17
+(STLLF18- STLFL17)/STLFL17
+
+#With CEW back online
+
+
+
+CES_Endings <- c("0000000001", "1500000001", "3000000001", "4000000001", "5000000001", "5500000001", "6000000001", "6500000001", "7000000001", "8000000001", "9000000001")
+
+CES_Names <- c("Total NonFarm", "Mining, Logging, and Construction", "Manfacturing", "Trade, Transportation, and Utilities", "Information", "Financial Activites", 
+               "Professional and Business Services", "Education and Health Services", "Leisure and Hospitality", "Other Services", "Government")
+
+PIT_CES_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', MSA_Fips[1], CES_Endings[i], sep = ""))))
+
+names(PIT_CES_Codes) <- CES_Names
+
+STL_CES_COdes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', MSA_Fips[2], CES_Endings[i], sep = ""))))
+
+names(STL_CES_COdes) <- CES_Names
+
+PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i]))
+
+STL_NonFarm <- lapply(seq_along(STL_CES_COdes), function(i) bls_api(STL_CES_COdes[i])) 
 
 
 
 
+MSA_Housing_As_Percent_of_income <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
+                        variables = "B25092_001", 
+                        year = 2017, 
+                        geometry = FALSE)
 
+St.Louis_Housing <- MSA_Housing_As_Percent_of_income%>%
+  subset(GEOID == 41180) 
+
+Pittsburgh_Housing<- MSA_Housing_As_Percent_of_income %>%
+  subset(GEOID == 38300)
+
+Pittsburgh_Housing$estimate
+
+St.Louis_Housing$estimate
 
