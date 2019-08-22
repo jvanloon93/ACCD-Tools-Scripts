@@ -11,7 +11,7 @@ v17 <- load_variables(2017, "acs5")
 MSA_Pop <- get_acs(
   geography = "metropolitan statistical area/micropolitan statistical area", 
   variables = "B01001_001", 
-  year = 2017, 
+  year = 2018, 
   geometry = FALSE)
 
 
@@ -247,9 +247,9 @@ STLLF18
 STLFL17
 (STLLF18- STLFL17)/STLFL17
 
-#With CEW back online
+PITUN18/PITLF18
 
-
+PITUN18
 
 CES_Endings <- c("0000000001", "1500000001", "3000000001", "4000000001", "5000000001", "5500000001", "6000000001", "6500000001", "7000000001", "8000000001", "9000000001")
 
@@ -267,8 +267,6 @@ names(STL_CES_COdes) <- CES_Names
 PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i]))
 
 STL_NonFarm <- lapply(seq_along(STL_CES_COdes), function(i) bls_api(STL_CES_COdes[i])) 
-
-
 
 
 MSA_Housing_As_Percent_of_income <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 

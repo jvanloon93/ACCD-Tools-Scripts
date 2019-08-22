@@ -74,5 +74,3 @@ USA <- function(year) {
   
 }
 
-
-
