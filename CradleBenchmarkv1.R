@@ -244,8 +244,33 @@ PITLF17
 (PITLF18-PITLF17)/PITLF17
 
 STLLF18
+
 STLFL17
 (STLLF18- STLFL17)/STLFL17
+
+PITUNMO06 <- Pittsburgh_Unemployment %>%
+     filter(year == 2019 & period == 'M06')
+
+PITLFm0619 <- Pittsburgh_LaborForce %>%
+  + filter(year == 2019 & period == 'M06')
+
+PITUNMO06$value/PITLFm0619$value
+
+STLUNM0619 <- St.Louis_Unemployment %>%
+  filter(year == 2019 & period == 'M06')
+
+STLLFM019 <- St.Louis_LaborForce %>%
+  filter(year == 2019 & period == 'M06')
+
+PITUNMO06$value/PITLFm0619$value
+
+STLUNM0619$value/STLLFM019$value
+
+STLUN18/STLLF18
+
+STLUN17/STLFL17
+
+
 
 #With CEW back online
 
