@@ -1,4 +1,3 @@
-install.packages("bea.R")
 library(tidycensus)
 library(blscrapeR)
 library(bea.R)
@@ -161,7 +160,7 @@ St.Louis_HS_ED_18_to_44_Percent
 St.Louis_HigherED_18_to_44_Percent
 
 MSA_Fips <- c("4238300", "2941180")
-MSA_Fips_NoState <- c("3830", "41180")
+MSA_Fips_NoState <- c("3830", "4118")
 
 
 LaborForce_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips), function(i) (paste('LAUMT', MSA_Fips[i],'00000006', sep = ""))))
