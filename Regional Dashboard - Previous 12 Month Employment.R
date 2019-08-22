@@ -3,6 +3,7 @@ library(rjson)
 library(blscrapeR)
 library(usmap)
 
+
 ten_county_USA <- as.vector(c(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')), 'US000'))
 
 Employment_Code <- as.vector(sapply(seq_along(ten_county_USA), function(i) (paste('ENU', ten_county_USA[i],'10010', sep = ""))))
@@ -71,9 +72,19 @@ df_fn <- rbind(df_fn, colSums(df_fn[1:10, 1:4]))
 
 rownames(df_fn)[12] <- "Region"
 
-(df_fn[12,2]/df_fn[12,1])*1000
-(df_fn[12,4]/df_fn[12,3])*1000
-(df_fn[11,2]/df_fn[11,1])*1000
-(df_fn[12,4]/df_fn[12,3])*1000
+Region_Avg_Wage_17<- (df_fn[12,2]/df_fn[12,1])*1000
+Region_Avg_Wage_18 <- (df_fn[12,4]/df_fn[12,3])*1000
+USA_Avg_wage_17 <- (df_fn[11,2]/df_fn[11,1])*1000
+USA_Avg_Wage_18 <- (df_fn[11,4]/df_fn[11,3])*1000
 
+<<<<<<< HEAD
+=======
+Region_percent_change <- (Region_Avg_Wage_18 - Region_Avg_Wage_17)/Region_Avg_Wage_17
 
+USA_percent_change <- (USA_Avg_Wage_18 - USA_Avg_wage_17)/USA_Avg_wage_17
+
+Region_Avg_Wage_18
+USA_Avg_Wage_18
+Region_percent_change
+USA_percent_change
+>>>>>>> cf9d0242abfeede350700cb12d1e87bdc47c8324
