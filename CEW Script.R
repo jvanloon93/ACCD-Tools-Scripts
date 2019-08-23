@@ -48,7 +48,7 @@ Peer_MSAs <- function(year) {
   
   Peer_FIPs <- c("C1714", "C1746", "C1982", "C3334", "C4118")
   
-  Peer_Names <- c("Cincinnati, OH-KY-IN MSA", "Cleveland-Elyria, OH MSA", "Denver-Aurora-Lakewood, CO MSA",
+  Peer_Names <- c("Cincinnati, OH-KY-IN MSA", "Cleveland-Elyria, OH MSA", "Detroit-Warren_Dearborn, MI MSA",
                   "Milwaukee-Waukesha-West Allis, WI MSA","St. Louis, MO-IL MSA")
   
   lst <- lapply(seq_along(Peer_FIPs), function(i) qcew_api(year = year , qtr = 'a', slice = 'area', Peer_FIPs[i]))
