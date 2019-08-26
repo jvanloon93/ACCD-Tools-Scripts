@@ -74,3 +74,51 @@ USA <- function(year) {
   
 }
 
+#Naming Logic: "TC" = Total Covered, "TP" = Total Private, "N" = Naics Supersector 
+#Government Calculated Total Covered - Total Private
+#County level NAICS sector agglvl_code == 74, MSA level == 44
+
+PRA18 <- PRA_10_County(2018) %>% bind_rows()
+
+PRATC18 <- PRA18 %>%
+  filter(own_code == 0) %>%
+  summarise(Total_Covered = sum(annual_avg_emplvl))
+
+PRATP18 <- PRA18 %>%
+  filter(own_code == 5 & industry_code == 10) %>%
+  summarise(Total_PRivate = sum(annual_avg_emplvl))
+
+PRAN18 <- PRA18 %>%
+  filter(agglvl_code == 74) %>%
+  group_by(industry_code) %>%
+  summarise(NAICS_Emp = sum(annual_avg_emplvl), NAICS_Est = sum(annual_avg_estabs), NAICS_Wage = sum(total_annual_wages)) %>%
+  mutate(Naics_Ann_Wage = NAICS_Wage/NAICS_Emp)
+
+PRA17 <- PRA_10_County(2017) %>% bind_rows()
+
+PRATC17 <- PRA17 %>%
+  filter(own_code == 0) %>%
+  summarise(Total_Covered = sum(annual_avg_emplvl))
+
+PRATC17 <- PRA17 %>%
+  filter(own_code == 0) %>%
+  summarise(Total_Covered = sum(annual_avg_emplvl))
+
+PRATP17 <- PRA17 %>%
+  filter(own_code == 5 & industry_code == 10) %>%
+  summarise(Total_PRivate = sum(annual_avg_emplvl))
+
+PRAN17 <- PRA17 %>%
+  filter(agglvl_code == 74) %>%
+  group_by(industry_code) %>%
+  summarise(NAICS_Emp = sum(annual_avg_emplvl), NAICS_Est = sum(annual_avg_estabs), NAICS_Wage = sum(total_annual_wages)) %>%
+  mutate(Naics_Ann_Wage = NAICS_Wage/NAICS_Emp)
+
+qplot(data = PRAN18, x = industry_code, y = NAICS_Emp)
+
+PEER18 <- Peer_MSAs(2018) %>% bind_rows()
+
+PeerN18 <- PEER18 %>%
+  filter(agglvl_code == 44) %>%
+  group_by(industry_code) %>%
+  summarise(NAICs_Avg_Emp = mean(annual_avg_emplvl))
