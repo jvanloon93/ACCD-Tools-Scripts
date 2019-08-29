@@ -4,6 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(usmap)
 
+
 PRA_10_County <- function(year) {
 
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
