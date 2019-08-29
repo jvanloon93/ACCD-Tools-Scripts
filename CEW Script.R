@@ -82,43 +82,57 @@ PRA18 <- PRA_10_County(2018) %>% bind_rows()
 
 PRATC18 <- PRA18 %>%
   filter(own_code == 0) %>%
-  summarise(Total_Covered = sum(annual_avg_emplvl))
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs), Wage = sum(total_annual_wages)) %>%
+  mutate(Ann_Wage = Wage/Emp)
 
 PRATP18 <- PRA18 %>%
   filter(own_code == 5 & industry_code == 10) %>%
-  summarise(Total_PRivate = sum(annual_avg_emplvl))
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs), Wage = sum(total_annual_wages)) %>%
+  mutate(Ann_Wage = Wage/Emp)
 
 PRAN18 <- PRA18 %>%
-  filter(agglvl_code == 74) %>%
+  filter(agglvl_code == 74 & own_code == 5) %>%
   group_by(industry_code) %>%
-  summarise(NAICS_Emp = sum(annual_avg_emplvl), NAICS_Est = sum(annual_avg_estabs), NAICS_Wage = sum(total_annual_wages)) %>%
-  mutate(Naics_Ann_Wage = NAICS_Wage/NAICS_Emp)
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs), Wage = sum(total_annual_wages)) %>%
+  mutate(Ann_Wage = Wage/Emp)
 
 PRA17 <- PRA_10_County(2017) %>% bind_rows()
 
 PRATC17 <- PRA17 %>%
   filter(own_code == 0) %>%
-  summarise(Total_Covered = sum(annual_avg_emplvl))
-
-PRATC17 <- PRA17 %>%
-  filter(own_code == 0) %>%
-  summarise(Total_Covered = sum(annual_avg_emplvl))
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs))
 
 PRATP17 <- PRA17 %>%
   filter(own_code == 5 & industry_code == 10) %>%
-  summarise(Total_PRivate = sum(annual_avg_emplvl))
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs))
 
 PRAN17 <- PRA17 %>%
+  filter(agglvl_code == 74 & own_code == 5) %>%
+  group_by(industry_code) %>%
+  summarise(NAICS_Emp = sum(annual_avg_emplvl), NAICS_Est = sum(annual_avg_estabs), NAICS_Wage = sum(total_annual_wages)) %>%
+  mutate(Naics_Ann_Wage = NAICS_Wage/NAICS_Emp)
+
+PRA16 <- PRA_10_County(2016) %>% bind_rows()
+
+
+PRAN16 <- PRA16 %>%
   filter(agglvl_code == 74) %>%
   group_by(industry_code) %>%
   summarise(NAICS_Emp = sum(annual_avg_emplvl), NAICS_Est = sum(annual_avg_estabs), NAICS_Wage = sum(total_annual_wages)) %>%
   mutate(Naics_Ann_Wage = NAICS_Wage/NAICS_Emp)
 
-qplot(data = PRAN18, x = industry_code, y = NAICS_Emp)
+USA17 <- USA(2017) 
 
-PEER18 <- Peer_MSAs(2018) %>% bind_rows()
+USATC17 <- USA17 %>%
+  filter(own_code == 0) %>%
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs))
 
-PeerN18 <- PEER18 %>%
-  filter(agglvl_code == 44) %>%
+USATP17 <- USA17 %>%
+  filter(own_code == 5 & industry_code == 10) %>%
+  summarise(Emp = sum(annual_avg_emplvl), Est = sum(annual_avg_estabs))
+
+USAN17 <- USA17 %>%
+  filter(agglvl_code == 14 & own_code == 5) %>%
   group_by(industry_code) %>%
-  summarise(NAICs_Avg_Emp = mean(annual_avg_emplvl))
+  summarise(NAICS_Emp = sum(annual_avg_emplvl), NAICS_Est = sum(annual_avg_estabs), NAICS_Wage = sum(total_annual_wages)) %>%
+  mutate(Naics_Ann_Wage = NAICS_Wage/NAICS_Emp)
