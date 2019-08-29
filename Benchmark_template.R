@@ -8,6 +8,7 @@ library(usmap)
 v17 <- load_variables(2017, "acs5")
 
 
+
 MSA_Fips <- c("38300", "41180")
 MSA_Fips_WSate <- c("4238300", "2941180")
 MSA_Fips_NoState_noZero <- c("3830", "4118")
