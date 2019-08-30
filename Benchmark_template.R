@@ -8,7 +8,6 @@ library(usmap)
 v17 <- load_variables(2017, "acs5")
 
 
-
 MSA_Fips <- c("38300", "41180")
 MSA_Fips_WSate <- c("4238300", "2941180")
 MSA_Fips_NoState_noZero <- c("3830", "4118")
@@ -17,7 +16,7 @@ MSA_Fips_NoState_noZero <- c("3830", "4118")
 MSA_Pop <- get_acs(
   geography = "metropolitan statistical area/micropolitan statistical area", 
   variables = "B01001_001", 
-  year = 2017, 
+  year = 2018, 
   geometry = FALSE)
 
 
