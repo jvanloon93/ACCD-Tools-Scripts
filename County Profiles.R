@@ -72,7 +72,7 @@ Median_Household_income <- get_acs(geography = "county",
 
 Persons_below_poverty_line <- get_acs(geography = "county", 
                                  state = "PA", 
-                                 variables = "B19013_001", 
+                                 variables = "B17013_001", 
                                  year = 2017, 
                                  geometry = FALSE) %>%
                           filter(GEOID %in% c(ten_county)) %>%
@@ -115,4 +115,8 @@ Bachelors_over_25 <- lapply(seq_along(Bachelors_over_25_vars),
               summarise(Bachelors_over_25 = sum(estimate)) %>%
               select(Bachelors_over_25)
 
+
+Census_Pull <- cbind(Census_Pull, Median_Household_income, Persons_below_poverty_line)
+
 #select specfic columns, line population up and 
+
