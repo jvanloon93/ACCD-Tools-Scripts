@@ -5,6 +5,8 @@ library(usmap)
 
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
 
+names(ten_county) <- c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')
+
 #Census_Pull <- tibble(County_Name = as.character(),
                       #GEOID = as.numeric(), 
                       #Total_population = as.numeric(),
