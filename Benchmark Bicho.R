@@ -10,6 +10,7 @@ library(tidyverse)
 library(usmap)
 
 
+
 v17 <- load_variables(2017, "acs5")
 
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
