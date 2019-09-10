@@ -20,7 +20,7 @@ ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver
 MSA_Fips <- c("35620", "31080", "16980", "19100", "14460", "41860")
 MSA_Fips_WSate <- c("3635620", "0631080", "1716980", "4819100", "2571650", "0641860")
 #Boston not a MSA but NECTA 
-MSA_Fips_NoState_noZero <- c()
+MSA_Fips_NoState_noZero <- c("3562", "3108", "1698", "1910", "7165", "4186")
 
 
 PA_Pop<- get_acs(
@@ -135,8 +135,29 @@ Ten_county_HigherEd <- Ten_county_HigherEd %>%
   summarise(sum(estimate)) %>%
   rename(Assoc_and_Higher = "sum(estimate)")
 
-Ten_County_ed <- merge()
+Ten_County_ed <- merge(All_Ed_Total_Ten_County, ten_county_HS, by = "GEOID")
 
+Ten_County_ed <- merge(Ten_County_ed, Ten_county_HigherEd, by = "GEOID")
+
+Ten_County_ed <- Ten_County_ed %>%
+  mutate(HS_Percentage = High_School_Graduates_or_Higher / All_Education, 
+         Assoc_and_Higher_Percentage =  Assoc_and_Higher / All_Education)
+
+createSheet(book, "Ten County Ed All")
+writeWorksheet(book, Ten_County_ed, sheet = "Ten County Ed All" )
+
+Bicho_ed <- merge(All_Ed_Total_MSA, MSA_HS)
+
+Bicho_ed <- merge(Bicho_ed, MSA_HigherEd)
+
+Bicho_ed <- Bicho_ed %>%
+  mutate(HS_Percentage = High_School_Graduates_or_Higher / All_Education, 
+         Assoc_and_Higher_Percentage =  Assoc_and_Higher / All_Education)
+
+createSheet(book, "MSA Ed All")
+writeWorksheet(book, Bicho_ed, sheet = "MSA Ed All")
+
+saveWorkbook(book)
 
 Total_18_44_vars <- c("B15001_003", "B15001_011", "B15001_019", "B15001_044", "B15001_052", "B15001_060")
 
@@ -189,7 +210,7 @@ HS_Education_18_to_44_MSA <- HS_Education_18_to_44_MSA %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID) %>%
   summarise(sum(estimate)) %>%
-  rename(HS_Education_18_to_44 = "sum(estimate")
+  rename(HS_Education_18_to_44 = "sum(estimate)")
 
 
 HS_Education_18_to_44_Ten_County <- bind_rows(lapply(seq_along(HS_Education_18_to_44_vars), 
@@ -204,7 +225,7 @@ HS_Education_18_to_44_Ten_County <- HS_Education_18_to_44_Ten_County %>%
   subset(GEOID %in% ten_county) %>%
   group_by(GEOID) %>%
   summarise(sum(estimate)) %>%
-  rename(HS_Education_18_to_44 = "sum(estimate")
+  rename(HS_Education_18_to_44 = "sum(estimate)")
 
 
 Higher_Ed_18_to_44_MSA <- bind_rows(lapply(seq_along(Higher_Ed_18_to_44_vars), 
@@ -218,7 +239,7 @@ Higher_Ed_18_to_44_MSA <- Higher_Ed_18_to_44_MSA %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID)%>%
   summarise(sum(estimate)) %>%
-  rename(HS_Education_18_to_44 = "sum(estimate")
+  rename(Higher_Ed_18_to_44 = "sum(estimate)")
   
 
 
@@ -236,107 +257,62 @@ Higher_Ed_18_to_44_Ten_County <- Higher_Ed_18_to_44_Ten_County %>%
   summarise(sum(estimate)) %>%
   rename(Higher_Ed_18_to_44 = "sum(estimate)" )
 
+Ten_County_Names <- Ten_County_ed %>%
+  select(GEOID, NAME)
+
+Ten_County_ed_18_44 <- merge(Ten_County_Names, Total_18_44_County)
+Ten_County_ed_18_44 <- merge(Ten_County_ed_18_44, HS_Education_18_to_44_Ten_County)
+Ten_County_ed_18_44 <- merge(Ten_County_ed_18_44, Higher_Ed_18_to_44_Ten_County)
+
+Ten_County_ed_18_44 <- Ten_County_ed_18_44 %>%
+  mutate(HS_18_44_Percentage = HS_Education_18_to_44 / Total_18_44 , 
+         Assoc_and_Higher_18_44 =  Higher_Ed_18_to_44 / Total_18_44)
+
+Bicho_names <- Bicho_ed %>%
+  select(GEOID, NAME)
+
+Bicho_ed_18_44 <- merge(Bicho_names, Total_18_44_MSA)
+Bicho_ed_18_44 <- merge(Bicho_ed_18_44, HS_Education_18_to_44_MSA)
+Bicho_ed_18_44 <- merge(Bicho_ed_18_44, Higher_Ed_18_to_44_MSA)
+
+Bicho_ed_18_44 <- Bicho_ed_18_44 %>%
+  mutate(HS_18_44_Percentage = HS_Education_18_to_44 / Total_18_44 , 
+         Assoc_and_Higher_18_44 =  Higher_Ed_18_to_44 / Total_18_44)
+
+createSheet(book, "10-County 18 to 44")
+writeWorksheet(book, Ten_County_ed_18_44, sheet = "10-County 18 to 44")
+
+createSheet(book, "MSA Ed 18 to 44")
+writeWorksheet(book, Bicho_ed_18_44, sheet = "MSA Ed 18 to 44")
+
+saveWorkbook(book)
+
+
 
 LaborForce_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_WSate), function(i) (paste('LAUMT', MSA_Fips_WSate[i],'00000006', sep = ""))))
 
-LaborForce_Ten_County_Codes <- as.vector(sapply(seq_along(ten_county), function(i) (paste('LAUMT', ten_county[i],'00000006', sep = ""))))
+LaborForce_Ten_County_Codes <- as.vector(sapply(seq_along(ten_county), function(i) (paste('LAUCN', ten_county[i],'0000000006', sep = ""))))
 
 MSA_LaborForce <- bind_rows(lapply(seq_along(LaborForce_MSA_Codes), function(i) bls_api(LaborForce_MSA_Codes[i])))
 
-MSA_LaborForceT <- MSA_LaborForce
+Ten_County_LaborForce <- bind_rows(lapply(seq_along(LaborForce_Ten_County_Codes), function(i) bls_api(LaborForce_Ten_County_Codes[i])))
 
-MSA_LaborForceT18 <- MSA_LaborForceT %>%
+MSA_LaborForce18 <- MSA_LaborForce %>%
   subset(year == 2018) %>%
   group_by(seriesID) %>%
   summarise(mean(value))
 
 Unemployment_MSA_codes <- as.vector(sapply(seq_along(MSA_Fips), function(i) (paste('LAUMT', MSA_Fips[i],'00000004', sep = ""))))
 
-Pittsburgh_Unemployment <-bls_api(c(Unemployment_MSA_codes[1]))
-
-St.Louis_Unemployment <- bls_api(c(Unemployment_MSA_codes[2]))
-
-PITUN18 <- Pittsburgh_Unemployment %>%
-  filter(year == 2018)
-
-PITUN18 <- mean(PITUN18$value)
-
-PITUN17 <- Pittsburgh_Unemployment %>%
-  filter(year == 2017)
-
-PITUN17 <- mean(PITUN17$value)
-
-STLUN18 <- St.Louis_Unemployment %>%
-  filter(year == 2018)
-
-STLUN18 <- mean(STLUN18$value)
-
-STLUN17 <- St.Louis_Unemployment %>%
-  filter(year == 2017)
-
-STLUN17 <- mean(STLUN17$value)
+Unemployment_ten_county_codes <- as.vector(sapply(seq_along(ten_county), function(i) (paste('LAUCN', ten_county[i],'0000000004', sep = ""))))
 
 Employment_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'10010', sep = ""))))
 
+Employment_Ten_County_Codes <- as.vector(sapply(seq_along(ten_county), function(i) (paste('ENU', ten_county[i],'10010', sep = ""))))
+  
 Total_Wage_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'30010', sep = ""))))
 
-Pittsburgh_Employment <- bls_api(c(Employment_MSA_Codes[1]))
-
-Pittsburgh_Total_Wages <- bls_api(c(Total_Wage_MSA_Codes[1]))
-
-St.Louis_Employment <- bls_api(c(Employment_MSA_Codes[2]))
-
-St.Louis_Total_Wages <- bls_api(c(Total_Wage_MSA_Codes[2]))
-
-EmploymentPTS_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'10554', sep = ""))))
-
-Total_WagPTSe_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i) (paste('ENUC', MSA_Fips_NoState[i],'30554', sep = ""))))
-
-PITPTS_Employment <- bls_api(c(EmploymentPTS_MSA_Codes[1]))
-
-PITPTS_Total_wages <- bls_api(c(Total_WagPTSe_MSA_Codes[1]))
-
-STLPTS_Employment <- bls_api(c(EmploymentPTS_MSA_Codes[2]))
-
-STLPTS_Total_Wages <- bls_api(c(Total_WagPTSe_MSA_Codes[2]))
-
-PITLF18
-PITLF17
-(PITLF18-PITLF17)/PITLF17
-
-STLLF18
-
-STLFL17
-(STLLF18- STLFL17)/STLFL17
-
-<<<<<<< HEAD
-PITUN18/PITLF18
-=======
-PITUNMO06 <- Pittsburgh_Unemployment %>%
-     filter(year == 2019 & period == 'M06')
-
-PITLFm0619 <- Pittsburgh_LaborForce %>%
-  + filter(year == 2019 & period == 'M06')
-
-PITUNMO06$value/PITLFm0619$value
-
-STLUNM0619 <- St.Louis_Unemployment %>%
-  filter(year == 2019 & period == 'M06')
-
-STLLFM019 <- St.Louis_LaborForce %>%
-  filter(year == 2019 & period == 'M06')
-
-PITUNMO06$value/PITLFm0619$value
-
-STLUNM0619$value/STLLFM019$value
-
-STLUN18/STLLF18
-
-STLUN17/STLFL17
-
-
-
-#With CEW back online
+Total_Wage_Ten_County_Codes <- as.vector(sapply(seq_along(ten_county), function(i) (paste('ENU', ten_county[i],'30010', sep = ""))))
 
 >>>>>>> ef49d648512001fbcae36e467e91f790756790eb
 
