@@ -9,9 +9,11 @@ library(blscrapeR)
 library(tidyverse)
 library(usmap)
 
-
-
 v17 <- load_variables(2017, "acs5")
+
+book <- loadWorkbook("Benchmarking.xls", create = TRUE)
+
+saveWorkbook(book)
 
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
 
@@ -20,7 +22,6 @@ MSA_Fips_WSate <- c("3635620", "0631080", "1716980", "4819100", "2571650", "0641
 #Boston not a MSA but NECTA 
 MSA_Fips_NoState_noZero <- c()
 
-loadWorkbook()
 
 PA_Pop<- get_acs(
   geography = "county", 
@@ -30,7 +31,8 @@ PA_Pop<- get_acs(
   geometry = FALSE)
 
 ten_County_pop <- PA_Pop %>%
-  subset(GEOID %in% ten_county) 
+  subset(GEOID %in% ten_county) %>%
+ rename(Resident_Population_Estimate = estimate) 
 
 MSA_Pop <- get_acs(
   geography = "metropolitan statistical area/micropolitan statistical area", 
@@ -39,8 +41,13 @@ MSA_Pop <- get_acs(
   geometry = FALSE)
 
 Bicho_Pop <- MSA_Pop %>%
-  subset(GEOID %in% MSA_Fips)
+  subset(GEOID %in% MSA_Fips) %>%
+  rename(Resident_Population_Estimate = estimate)
 
+Pop <- rbind(ten_County_pop, Bicho_Pop)
+
+createSheet(book, "Population")
+writeWorksheet(book, Pop, sheet = "Population")
 
 All_Ed_Total_MSA <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
                     variables = "B15001_001", 
@@ -49,8 +56,7 @@ All_Ed_Total_MSA <- get_acs(geography = "metropolitan statistical area/micropoli
 
 All_Ed_Total_MSA <- All_Ed_Total_MSA %>%
   subset(GEOID %in% MSA_Fips) %>%
-  group_by(GEOID) 
-
+  rename(All_Education = estimate)
 
 All_Ed_Total_Ten_County <- get_acs(geography = "county",
                                    state = "PA",
@@ -59,7 +65,8 @@ All_Ed_Total_Ten_County <- get_acs(geography = "county",
                                    geometry = FALSE)
 
 All_Ed_Total_Ten_County <- All_Ed_Total_Ten_County %>%
-  subset(GEOID %in% ten_county) 
+  subset(GEOID %in% ten_county)%>%
+  rename(All_Education = estimate)
 
 
 HS_Education_vars <- c( "B15001_006", "B15001_007", "B15001_008", "B15001_009", "B15001_010", "B15001_014", "B15001_015", "B15001_016", "B15001_017", 
@@ -79,8 +86,8 @@ MSA_HS <- bind_rows(lapply(seq_along(HS_Education_vars),
 MSA_HS <- MSA_HS %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate)) %>%
-  rename("High School Graduates or Higher" = "sum(estimate)")
+  summarise(sum(estimate)) %>% 
+  rename(High_School_Graduates_or_Higher = "sum(estimate)")
 
 ten_county_HS <- bind_rows(lapply(seq_along(HS_Education_vars), 
                            function(i) get_acs(
@@ -93,7 +100,8 @@ ten_county_HS <- bind_rows(lapply(seq_along(HS_Education_vars),
 ten_county_HS <- ten_county_HS %>%
   subset(GEOID %in% ten_county) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate)) 
+  summarise(sum(estimate)) %>%
+  rename(High_School_Graduates_or_Higher = "sum(estimate)")
 
 Assoc_and_Higher_Education_vars <- c( "B15001_008", "B15001_009", "B15001_010", "B15001_016", "B15001_017", "B15001_018", "B15001_024", "B15001_025", "B15001_026",
                         "B15001_032", "B15001_033", "B15001_034", "B15001_040", "B15001_041", "B15001_042", "B15001_049", "B15001_050", "B15001_051",
@@ -110,7 +118,8 @@ MSA_HigherEd <- bind_rows(lapply(seq_along(Assoc_and_Higher_Education_vars),
 MSA_HigherEd <- MSA_HigherEd %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(Assoc_and_Higher = "sum(estimate)")
 
 Ten_county_HigherEd <- bind_rows(lapply(seq_along(Assoc_and_Higher_Education_vars), 
                                  function(i) get_acs(
@@ -123,7 +132,10 @@ Ten_county_HigherEd <- bind_rows(lapply(seq_along(Assoc_and_Higher_Education_var
 Ten_county_HigherEd <- Ten_county_HigherEd %>%
   subset(GEOID %in% ten_county) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(Assoc_and_Higher = "sum(estimate)")
+
+Ten_County_ed <- merge()
 
 
 Total_18_44_vars <- c("B15001_003", "B15001_011", "B15001_019", "B15001_044", "B15001_052", "B15001_060")
@@ -147,7 +159,8 @@ Total_18_44_MSA <- bind_rows(lapply(seq_along(Total_18_44_vars),
 Total_18_44_MSA <- Total_18_44_MSA %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(Total_18_44 = "sum(estimate)")
 
 Total_18_44_County <- bind_rows(lapply(seq_along(Total_18_44_vars), 
                                     function(i) get_acs(
@@ -160,7 +173,9 @@ Total_18_44_County <- bind_rows(lapply(seq_along(Total_18_44_vars),
 Total_18_44_County <- Total_18_44_County %>%
   subset(GEOID %in% ten_county) %>%
   group_by(GEOID) %>% 
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(Total_18_44 = "sum(estimate)")
+
   
 
 HS_Education_18_to_44_MSA <- bind_rows(lapply(seq_along(HS_Education_18_to_44_vars), 
@@ -173,7 +188,8 @@ HS_Education_18_to_44_MSA <- bind_rows(lapply(seq_along(HS_Education_18_to_44_va
 HS_Education_18_to_44_MSA <- HS_Education_18_to_44_MSA %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(HS_Education_18_to_44 = "sum(estimate")
 
 
 HS_Education_18_to_44_Ten_County <- bind_rows(lapply(seq_along(HS_Education_18_to_44_vars), 
@@ -187,7 +203,8 @@ HS_Education_18_to_44_Ten_County <- bind_rows(lapply(seq_along(HS_Education_18_t
 HS_Education_18_to_44_Ten_County <- HS_Education_18_to_44_Ten_County %>%
   subset(GEOID %in% ten_county) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(HS_Education_18_to_44 = "sum(estimate")
 
 
 Higher_Ed_18_to_44_MSA <- bind_rows(lapply(seq_along(Higher_Ed_18_to_44_vars), 
@@ -200,7 +217,9 @@ Higher_Ed_18_to_44_MSA <- bind_rows(lapply(seq_along(Higher_Ed_18_to_44_vars),
 Higher_Ed_18_to_44_MSA <- Higher_Ed_18_to_44_MSA %>%
   subset(GEOID %in% MSA_Fips) %>%
   group_by(GEOID)%>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(HS_Education_18_to_44 = "sum(estimate")
+  
 
 
 Higher_Ed_18_to_44_Ten_County <- bind_rows(lapply(seq_along(Higher_Ed_18_to_44_vars), 
@@ -214,7 +233,8 @@ Higher_Ed_18_to_44_Ten_County <- bind_rows(lapply(seq_along(Higher_Ed_18_to_44_v
 Higher_Ed_18_to_44_Ten_County <- Higher_Ed_18_to_44_Ten_County %>%
   subset(GEOID %in% ten_county) %>%
   group_by(GEOID) %>%
-  summarise(sum(estimate))
+  summarise(sum(estimate)) %>%
+  rename(Higher_Ed_18_to_44 = "sum(estimate)" )
 
 
 LaborForce_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_WSate), function(i) (paste('LAUMT', MSA_Fips_WSate[i],'00000006', sep = ""))))
