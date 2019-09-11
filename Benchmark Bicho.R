@@ -328,7 +328,7 @@ CES_Endings <- c("0000000001", "1500000001", "3000000001", "4000000001", "500000
 CES_Names <- c("Total NonFarm", "Mining, Logging, and Construction", "Manfacturing", "Trade, Transportation, and Utilities", "Information", "Financial Activites", 
                "Professional and Business Services", "Education and Health Services", "Leisure and Hospitality", "Other Services", "Government")
 
-PIT_CES_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', MSA_Fips[1], CES_Endings[i], sep = ""))))
+PIT_CES_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[1], CES_Endings[i], sep = ""))))
 
 names(PIT_CES_Codes) <- CES_Names
 
@@ -336,13 +336,9 @@ STL_CES_COdes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SM
 
 names(STL_CES_COdes) <- CES_Names
 
-PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i]))
+PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i], registrationKey = "BLS_KEY"))
 
 STL_NonFarm <- lapply(seq_along(STL_CES_COdes), function(i) bls_api(STL_CES_COdes[i])) 
-
-
-
-
 
 MSA_Housing_As_Percent_of_income <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
                         variables = "B25092_001", 
