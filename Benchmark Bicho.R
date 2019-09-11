@@ -18,6 +18,13 @@ saveWorkbook(book)
 ten_county <- as.vector(fips('PA', county =  c('Allegheny', 'Armstrong', 'Beaver', 'Butler', 'Fayette','Greene', 'Indiana', 'Lawrence', 'Washington', 'Westmoreland')))
 
 MSA_Fips <- c("35620", "31080", "16980", "19100", "14460", "41860")
+CESFIPS <- c("4238300", MSA_Fips_WSate)
+
+CESFIPS_Names <- c("Pittsburgh, PA", "New York-Newark-Jersey City, NY-NJ-PA MSA",
+                   "Los Angeles-Long Beach-Anaheim, CA MSA", "Chicago-Naperville-Elgin, IL-IN-WI MSA",
+                   "Dallas-Fort Worth-Arlington, TX MSA", "Boston-Cambridge-Newton, MA-NH MSA",
+                   "San Francisco-Oakland-Berkeley, CA MSA")
+
 MSA_Fips_WSate <- c("3635620", "0631080", "1716980", "4819100", "2571650", "0641860")
 #Boston not a MSA but NECTA 
 MSA_Fips_NoState_noZero <- c("3562", "3108", "1698", "1910", "7165", "4186")
@@ -316,8 +323,6 @@ Total_Wage_Ten_County_Codes <- as.vector(sapply(seq_along(ten_county), function(
 
 >>>>>>> ef49d648512001fbcae36e467e91f790756790eb
 
-PITUN18
-
 CES_Endings <- c("0000000001", "1500000001", "3000000001", "4000000001", "5000000001", "5500000001", "6000000001", "6500000001", "7000000001", "8000000001", "9000000001")
 
 CES_Names <- c("Total NonFarm", "Mining, Logging, and Construction", "Manfacturing", "Trade, Transportation, and Utilities", "Information", "Financial Activites", 
@@ -334,6 +339,9 @@ names(STL_CES_COdes) <- CES_Names
 PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i]))
 
 STL_NonFarm <- lapply(seq_along(STL_CES_COdes), function(i) bls_api(STL_CES_COdes[i])) 
+
+
+
 
 
 MSA_Housing_As_Percent_of_income <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
