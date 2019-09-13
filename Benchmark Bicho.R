@@ -387,9 +387,14 @@ Dallas_NonFarm <- Dallas_NonFarm %>%
 
 Boston_Nonfarm_Codes <-  as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[6], CES_Endings[i], sep = ""))))
 
+<<<<<<< HEAD
+=======
+PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i], registrationKey = "BLS_KEY"))
+>>>>>>> 28adc2fbb812c309bb412e4aef7fca864a74a2ec
 
 Boston_Nonfarm <-  bind_rows(lapply(seq_along(Boston_Nonfarm_Codes), function(i) bls_api(Boston_Nonfarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 
+<<<<<<< HEAD
 Boston_Nonfarm <- Boston_Nonfarm %>%
   filter(year == 2018) %>%
   group_by(seriesID) %>%
@@ -420,6 +425,8 @@ df <- cbind(as.data.frame(CES_Names), PIT_NonFarm$`Pittsburgh, PA Employees in T
   merge(df, Boston_Nonfarm) %>%
   merge(df, SanFran_nonfarm)
 
+=======
+>>>>>>> 28adc2fbb812c309bb412e4aef7fca864a74a2ec
 MSA_Housing_As_Percent_of_income <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
                         variables = "B25092_001", 
                         year = 2017, 
