@@ -39,7 +39,7 @@ PA_Pop<- get_acs(
 
 ten_County_pop <- PA_Pop %>%
   subset(GEOID %in% ten_county) %>%
- rename(Resident_Population_Estimate = estimate) 
+ rename(Resident_Population_Estimate = estimate )
 
 MSA_Pop <- get_acs(
   geography = "metropolitan statistical area/micropolitan statistical area", 
@@ -294,7 +294,7 @@ writeWorksheet(book, Bicho_ed_18_44, sheet = "MSA Ed 18 to 44")
 
 saveWorkbook(book)
 
-
+#Start of Laborforce, UR, and Average Wage 
 
 LaborForce_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_WSate), function(i) (paste('LAUMT', MSA_Fips_WSate[i],'00000006', sep = ""))))
 
@@ -321,28 +321,104 @@ Total_Wage_MSA_Codes <- as.vector(sapply(seq_along(MSA_Fips_NoState), function(i
 
 Total_Wage_Ten_County_Codes <- as.vector(sapply(seq_along(ten_county), function(i) (paste('ENU', ten_county[i],'30010', sep = ""))))
 
->>>>>>> ef49d648512001fbcae36e467e91f790756790eb
+#CES Non-Farm Labor
 
 CES_Endings <- c("0000000001", "1500000001", "3000000001", "4000000001", "5000000001", "5500000001", "6000000001", "6500000001", "7000000001", "8000000001", "9000000001")
 
 CES_Names <- c("Total NonFarm", "Mining, Logging, and Construction", "Manfacturing", "Trade, Transportation, and Utilities", "Information", "Financial Activites", 
                "Professional and Business Services", "Education and Health Services", "Leisure and Hospitality", "Other Services", "Government")
 
-PIT_CES_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', MSA_Fips[1], CES_Endings[i], sep = ""))))
+PIT_CES_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[1], CES_Endings[i], sep = ""))))
 
 names(PIT_CES_Codes) <- CES_Names
 
-STL_CES_COdes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', MSA_Fips[2], CES_Endings[i], sep = ""))))
+PIT_NonFarm <- bind_rows(lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 
-names(STL_CES_COdes) <- CES_Names
+PIT_NonFarm <- PIT_NonFarm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[1], ' Employees in Thousands') := "mean(value)")
+    
+NY_NonFarm_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[2], CES_Endings[i], sep = ""))))
 
-PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i]))
+NY_Non_Farm <-  bind_rows(lapply(seq_along(NY_NonFarm_Codes), function(i) bls_api(NY_NonFarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 
-STL_NonFarm <- lapply(seq_along(STL_CES_COdes), function(i) bls_api(STL_CES_COdes[i])) 
+NY_Non_Farm <- NY_Non_Farm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[2], ' Employees in Thousands') := "mean(value)")
+
+LA_NonFarm_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[3], CES_Endings[i], sep = ""))))
+
+LA_Non_farm <- bind_rows(lapply(seq_along(LA_NonFarm_Codes), function(i) bls_api(LA_NonFarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+
+LA_Non_farm <- LA_Non_farm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[3], ' Employees in Thousands') := "mean(value)")
+
+Chicago_Nonfarm_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[4], CES_Endings[i], sep = ""))))
+
+Chicago_NonFarm <- bind_rows(lapply(seq_along(Chicago_Nonfarm_Codes), function(i) bls_api(Chicago_Nonfarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+
+Chicago_NonFarm <- Chicago_NonFarm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[4], ' Employees in Thousands') := "mean(value)")
+
+Dallas_NonFarm_Codes <- as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[5], CES_Endings[i], sep = ""))))
+
+Dallas_NonFarm <-  bind_rows(lapply(seq_along(Dallas_NonFarm_Codes), function(i) bls_api(Dallas_NonFarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+  
+Dallas_NonFarm <- Dallas_NonFarm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[5], ' Employees in Thousands') := "mean(value)")
+
+Boston_Nonfarm_Codes <-  as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[6], CES_Endings[i], sep = ""))))
+
+
+Boston_Nonfarm <-  bind_rows(lapply(seq_along(Boston_Nonfarm_Codes), function(i) bls_api(Boston_Nonfarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+
+Boston_Nonfarm <- Boston_Nonfarm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[6], ' Employees in Thousands') := "mean(value)")
+
+SanFran_NonFarm_codes <-  as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[7], CES_Endings[i], sep = ""))))
+
+SanFran_nonfarm <- bind_rows(lapply(seq_along(SanFran_NonFarm_codes), function(i) bls_api(SanFran_NonFarm_codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+
+SanFran_nonfarm <- SanFran_nonfarm %>%
+  filter(year == 2018) %>%
+  group_by(seriesID) %>%
+  summarise(mean(value)) %>%
+  mutate(CES_Names = CES_Names) %>%
+  rename(!! paste0(CESFIPS_Names[7], ' Employees in Thousands') := "mean(value)")
+  
+df <- cbind(as.data.frame(CES_Names), PIT_NonFarm$`Pittsburgh, PA Employees in Thousands`, NY_Non_Farm$`New York-Newark-Jersey City, NY-NJ-PA MSA Employees in Thousands`, LA_Non_farm$`Los Angeles-Long Beach-Anaheim, CA MSA Employees in Thousands`, 
+            Chicago_NonFarm$`Chicago-Naperville-Elgin, IL-IN-WI MSA Employees in Thousands`, Dallas_NonFarm$`Dallas-Fort Worth-Arlington, TX MSA Employees in Thousands`, 
+            Boston_Nonfarm$`Boston-Cambridge-Newton, MA-NH MSA Employees in Thousands`, SanFran_nonfarm$`San Francisco-Oakland-Berkeley, CA MSA Employees in Thousands`)
 
 
 
-
+  merge(df, LA_Non_farm) %>%
+  merge(df, Chicago_NonFarm) %>%
+  merge(df, Dallas_NonFarm) %>%
+  merge(df, Boston_Nonfarm) %>%
+  merge(df, SanFran_nonfarm)
 
 MSA_Housing_As_Percent_of_income <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
                         variables = "B25092_001", 
