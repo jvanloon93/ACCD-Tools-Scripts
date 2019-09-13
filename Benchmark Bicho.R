@@ -387,14 +387,8 @@ Dallas_NonFarm <- Dallas_NonFarm %>%
 
 Boston_Nonfarm_Codes <-  as.vector(sapply(seq_along(CES_Endings), function(i) (paste('SMU', CESFIPS[6], CES_Endings[i], sep = ""))))
 
-<<<<<<< HEAD
-=======
-PIT_NonFarm <- lapply(seq_along(PIT_CES_Codes), function(i) bls_api(PIT_CES_Codes[i], registrationKey = "BLS_KEY"))
->>>>>>> 28adc2fbb812c309bb412e4aef7fca864a74a2ec
-
 Boston_Nonfarm <-  bind_rows(lapply(seq_along(Boston_Nonfarm_Codes), function(i) bls_api(Boston_Nonfarm_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 
-<<<<<<< HEAD
 Boston_Nonfarm <- Boston_Nonfarm %>%
   filter(year == 2018) %>%
   group_by(seriesID) %>%
@@ -416,14 +410,6 @@ SanFran_nonfarm <- SanFran_nonfarm %>%
 df <- cbind(as.data.frame(CES_Names), PIT_NonFarm$`Pittsburgh, PA Employees in Thousands`, NY_Non_Farm$`New York-Newark-Jersey City, NY-NJ-PA MSA Employees in Thousands`, LA_Non_farm$`Los Angeles-Long Beach-Anaheim, CA MSA Employees in Thousands`, 
             Chicago_NonFarm$`Chicago-Naperville-Elgin, IL-IN-WI MSA Employees in Thousands`, Dallas_NonFarm$`Dallas-Fort Worth-Arlington, TX MSA Employees in Thousands`, 
             Boston_Nonfarm$`Boston-Cambridge-Newton, MA-NH MSA Employees in Thousands`, SanFran_nonfarm$`San Francisco-Oakland-Berkeley, CA MSA Employees in Thousands`)
-
-
-
-  merge(df, LA_Non_farm) %>%
-  merge(df, Chicago_NonFarm) %>%
-  merge(df, Dallas_NonFarm) %>%
-  merge(df, Boston_Nonfarm) %>%
-  merge(df, SanFran_nonfarm)
 
 =======
 >>>>>>> 28adc2fbb812c309bb412e4aef7fca864a74a2ec
