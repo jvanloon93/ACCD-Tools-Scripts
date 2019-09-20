@@ -65,15 +65,19 @@ dfMSAs <- merge(Xwalk, dfcounties)
 dfMSAs <- dfMSAs %>%
   arrange(placeholder)
 
-MSAs <- c("38300", "21500", "27780", "11020", "49660", "48540", "48260", "17460", "15940", "34060")
+dft <- data.frame(MSAs, MSA_Names)
 
-MSA_Names <- c("Pittsburgh, PA", 'Erie, PA', 'Johnstown, PA', "Altona, PA", 'Youngstown-Warren-Boardman, OH-PA', "Wheeling, WV-OH", "Weirton-Steubenville, WV-OH", "Cleveland-Elyria, OH", "Canton-Massillon, OH", 'Morgantown, WV' )
+MSAs <- c("38300", "21500", "27780", "11020", "49660", "48540", "48260", "17460", "15940", "10420", "34060")
+
+MSA_Names <- c("Pittsburgh, PA", 'Erie, PA', 'Johnstown, PA', "Altoona, PA", 'Youngstown-Warren-Boardman, OH-PA', "Wheeling, WV-OH", "Weirton-Steubenville, WV-OH", "Cleveland-Elyria, OH", "Canton-Massillon, OH", "Akron, OH", 'Morgantown, WV' )
 
 MSA_less_johnstown <- MSAs[-3]
 
 #set up excel target 
 
 book <- loadWorkbook("Bluebird.xlsx", create = TRUE)
+
+#Census
 
 Pop <- get_estimates(geography = "county", product = "population", year = 2018)
 
@@ -163,6 +167,14 @@ df <- df %>%
   mutate(HS_Percentage = HS_Total_25_65/Ed_total_25_65, Bach_Percentage = Bach_Total_25_65/Ed_total_25_65) %>%
   arrange(placeholder)
 
+Median_Household_income  <- get_acs(geography = "county", variables = "B19013_001", year = 2017)
+
+Median_Household_income <- Median_Household_income %>%
+  filter(GEOID %in% county_fips) %>%
+  rename(Median_Household_Income = estimate, FIPS = GEOID) %>%
+  select(FIPS, Median_Household_Income)
+
+
 # Begin BLS Pull 
 
 Unemployment_Codes <- as.vector(sapply(seq_along(county_fips), function(i) (paste('LAUCN',county_fips[i],'0000000004', sep = ""))))
@@ -215,7 +227,32 @@ df <- merge(df, UN_LF)
 df <- df %>%
   mutate(Unemployment_Rate = Unemployment.Annual_Unemployment / Labor_Force.Annual_Laborforce)
 
+df <- merge(df, Median_Household_income)
 
+createSheet(book, "Demographics and Employment")
+
+writeWorksheet(book, df, "Demographics and Employment")
+
+
+# Workforce Compostion 
+
+MSAs_CEW <- sapply(seq_along(MSAs), function(i) paste0("C", substring(MSAs[i], 1, 4)))
+
+cew <- bind_rows(lapply(seq_along(MSAs_CEW), function(i) qcew_api(year = 2018, qtr = "a", slice = "area", sliceCode = MSAs_CEW[i])))
+
+TC <- cew %>%
+  filter(own_code == 0) %>%
+  select(area_fips, annual_avg_emplvl) %>%
+  rename(Total_Covered = annual_avg_emplvl)
+
+N <- cew %>%
+  filter(agglvl_code == 43 & own_code == 5) %>%
+  select(area_fips,industry_code, annual_avg_emplvl)
+
+TCN <- merge(N, TC)
+
+TCN <- TCN %>%
+  mutate(Industry_Percentage = annual_avg_emplvl/Total_Covered)
 
 # Begin by MSA Pull 
 
@@ -250,11 +287,65 @@ OES_Forklift_Operator <- OES_Forklift_Operator %>%
 OES <- rbind(OES_Warehouse_Manager, OES_Warehouse_Worker, OES_Supervisor_Manager, OES_Forklift_Operator)
 
 OES <- OES %>%
-  rename(Hourly_Wage = value, cbsa = MSA) 
+  rename(Hourly_Wage = value) 
 
-OES <- select(OES, cbsa, Hourly_Wage, Occupation)
+OES <- select(OES, MSA, Hourly_Wage, Occupation)
+
+#Blue Collar Percentage
+
+All_Occ_Codes <- as.vector(sapply(seq_along(MSAs), function(i) (paste('OEUM', "00", MSAs[i],'000000', '000000', '01', sep = ""))))
+
+CE_Occ_Codes <- as.vector(sapply(seq_along(MSAs), function(i) (paste('OEUM', "00", MSAs[i],'000000', '470000', '01', sep = ""))))
+
+IMR__Occ_Codes <- as.vector(sapply(seq_along(MSAs), function(i) (paste('OEUM', "00", MSAs[i],'000000','490000','01', sep = ""))))
+
+P_Occ_Codes <- as.vector(sapply(seq_along(MSAs), function(i) (paste('OEUM', "00", MSAs[i],'000000','510000', '01', sep = ""))))
+
+TMM_Occ_Codes<- as.vector(sapply(seq_along(MSAs), function(i) (paste('OEUM', "00", MSAs[i],'000000','530000','01', sep = ""))))
+
+All_Occ <- bind_rows(lapply(seq_along(All_Occ_Codes), function(i) bls_api(All_Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+
+All_Occ <- All_Occ %>%
+  mutate(as.numeric(MSAs))
+
+CE_OCC <- bind_rows(lapply(seq_along(CE_Occ_Codes), function(i) bls_api(CE_Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+CE_OCC <- CE_OCC %>% 
+  mutate(as.numeric(MSAs))
+  
+IMR_OCC <- bind_rows(lapply(seq_along(IMR__Occ_Codes), function(i) bls_api(IMR__Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+IMR_OCC <- IMR_OCC %>%
+  mutate(as.numeric(MSAs))
+
+P_Occ <- bind_rows(lapply(seq_along(P_Occ_Codes), function(i) bls_api(P_Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+P_Occ <- P_Occ %>%
+  mutate(as.numeric(MSAs))
+
+TMM_OCC <- bind_rows(lapply(seq_along(TMM_Occ_Codes), function(i) bls_api(TMM_Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
+TMM_OCC <- TMM_OCC %>%
+  mutate(as.numeric(MSAs))
+
+BC_Occ <- rbind(CE_OCC, IMR_OCC, P_Occ, TMM_OCC)
+
+BC_Occ <- BC_Occ %>%
+  group_by(`as.numeric(MSAs)`)%>%
+  summarise(sum(value)) %>% 
+  rename(MSA = 'as.numeric(MSAs)', Blue_Collar_Workforce = "sum(value)")
+
+#ran out of BLS server Calls 
 
 dfMSAsdata <- merge(dfMSAs, OES)
+
+dfMSAdata1 <- merge(dft, OES)
+
+createSheet(book, "OES MSA Crosswalk")
+
+createSheet(book, "Occupation data")
+
+writeWorksheet(book, dfMSAs, "OES MSA Crosswalk")
+
+writeWorksheet(book, dfMSAsdata, "Occupation data")
+
+
 
 
 
