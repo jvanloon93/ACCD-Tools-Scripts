@@ -1,3 +1,5 @@
+
+install.packages("rJava")
 library(XLConnect)
 library(XLConnectJars)
 library(rJava)
@@ -266,6 +268,12 @@ OES_Forklift_Operator_Codes<- as.vector(sapply(seq_along(MSAs), function(i) (pas
 
 OES_Warehouse_Manager <- bind_rows(lapply(seq_along(OES_Warehouse_Manager_Codes), function(i) bls_api(OES_Warehouse_Manager_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 
+Nat_OES_Codes <- c('113071', '511011', '537061', '537051' )
+
+Nat_OES_Codes_Full <- as.vector(sapply(seq_along(Nat_OES_Codes), function(i) (paste('OEUN', "00", '00000','000000',Nat_OES_Codes[i],'03', sep = ""))))
+
+Nat_OES <- bind_rows(lapply(seq_along(Nat_OES_Codes_Full), function(i) bls_api(Nat_OES_Codes_Full[i], registrationKey = Sys.getenv("BLS_Key"))))
+
 OES_Warehouse_Manager <- OES_Warehouse_Manager %>%
   mutate(MSA = as.numeric(MSAs[-3]),  Occupation = "Warehouse Manager")
 
@@ -306,8 +314,10 @@ TMM_Occ_Codes<- as.vector(sapply(seq_along(MSAs), function(i) (paste('OEUM', "00
 All_Occ <- bind_rows(lapply(seq_along(All_Occ_Codes), function(i) bls_api(All_Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 
 All_Occ <- All_Occ %>%
-  mutate(as.numeric(MSAs))
-
+  mutate(as.numeric(MSAs)) %>%
+  rename(cbsa = 'as.numeric(MSAs)', All_OCC_Employment = value) %>%
+  select(cbsa, All_OCC_Employment)
+  
 CE_OCC <- bind_rows(lapply(seq_along(CE_Occ_Codes), function(i) bls_api(CE_Occ_Codes[i], registrationKey = Sys.getenv("BLS_Key"))))
 CE_OCC <- CE_OCC %>% 
   mutate(as.numeric(MSAs))
@@ -329,13 +339,19 @@ BC_Occ <- rbind(CE_OCC, IMR_OCC, P_Occ, TMM_OCC)
 BC_Occ <- BC_Occ %>%
   group_by(`as.numeric(MSAs)`)%>%
   summarise(sum(value)) %>% 
-  rename(MSA = 'as.numeric(MSAs)', Blue_Collar_Workforce = "sum(value)")
+  rename(cbsa = 'as.numeric(MSAs)', Blue_Collar_Workforce = "sum(value)")
+
 
 #ran out of BLS server Calls 
 
 dfMSAsdata <- merge(dfMSAs, OES)
 
-dfMSAdata1 <- merge(dft, OES)
+dft <- merge(dfMSAsdata, BC_Occ)
+
+dft <- merge(dft, All_Occ)
+
+dft <- dft %>%
+  mutate(Blue_Collar_Percentage = (Blue_Collar_Workforce/All_OCC_Employment))
 
 createSheet(book, "OES MSA Crosswalk")
 
@@ -343,10 +359,83 @@ createSheet(book, "Occupation data")
 
 writeWorksheet(book, dfMSAs, "OES MSA Crosswalk")
 
-writeWorksheet(book, dfMSAsdata, "Occupation data")
+writeWorksheet(book, dft, "Occupation data")
+
+# National Level 
+
+Pop_Nat <- get_estimates(geography = "us", product = "population", year = 2018)
+
+Pop_Nat <- Pop_Nat %>%
+  filter(variable == "POP")%>%
+  rename(Total_Population = value, FIPS = GEOID) %>%
+  select(FIPS, Total_Population)
+
+Pop_Age_Nat<- bind_rows(lapply(seq_along(Age_vars$name), 
+                            function(i) get_acs(
+                              geography = 'us', 
+                              variables = Age_vars$name[i], 
+                              year = 2017, 
+                              geometry = FALSE)))
+
+Pop_Age_Nat <- Pop_Age_Nat %>%
+  group_by(GEOID) %>%
+  summarise(sum(estimate)) %>%
+  rename(FIPS = GEOID, Population_18_to_34 = "sum(estimate)") %>%
+  select(FIPS, Population_18_to_34)
+
+Ed_total_25_65_Nat <- bind_rows(lapply(seq_along(Ed_total_vars_25_65$name), 
+                                   function(i) get_acs(
+                                     geography = 'us', 
+                                     variables = Ed_total_vars_25_65$name[i], 
+                                     year = 2017, 
+                                     geometry = FALSE)))
+
+Ed_total_25_65_Nat <- Ed_total_25_65_Nat %>%
+  group_by(GEOID) %>%
+  summarise(sum(estimate)) %>%
+  rename(FIPS = GEOID, Ed_total_25_65= "sum(estimate)") %>%
+  select(FIPS, Ed_total_25_65)
+
+
+HS_Total_25_65_Nat <- bind_rows(lapply(seq_along(HS_Total_vars_25_65$name), 
+                                   function(i) get_acs(
+                                     geography = 'us', 
+                                     variables = HS_Total_vars_25_65$name[i], 
+                                     year = 2017, 
+                                     geometry = FALSE)))
+
+HS_Total_25_65_Nat <- HS_Total_25_65_Nat %>%
+  group_by(GEOID) %>%
+  summarise(sum(estimate)) %>%
+  rename(FIPS = GEOID, HS_Total_25_65 = "sum(estimate)") %>%
+  select(FIPS, HS_Total_25_65)
 
 
 
+Bach_Total_25_65_Nat <- bind_rows(lapply(seq_along(Bach_Total_Vars_25_65$name), 
+                                     function(i) get_acs(
+                                       geography = 'us', 
+                                       variables = Bach_Total_Vars_25_65$name[i], 
+                                       year = 2017, 
+                                       geometry = FALSE)))
 
+Bach_Total_25_65_Nat <- Bach_Total_25_65_Nat %>%
+  group_by(GEOID) %>%
+  summarise(sum(estimate)) %>%
+  rename(FIPS = GEOID, Bach_Total_25_65 = "sum(estimate)") %>%
+  select(FIPS, Bach_Total_25_65)
 
+dfn <- merge(Pop_Nat, Pop_Age_Nat)
 
+dfn <- merge(dfn, Ed_total_25_65_Nat)
+
+dfn <- merge(dfn, HS_Total_25_65_Nat)
+
+dfn <- merge(dfn, Bach_Total_25_65_Nat)
+
+dfn <- dfn %>%
+  mutate(HS_Percentage = HS_Total_25_65 / Ed_total_25_65, Bach_Percentage = Bach_Total_25_65 / Ed_total_25_65)
+
+createSheet(book, "National Demographics")
+
+writeWorksheet(book, dfn, "National Demographics")
