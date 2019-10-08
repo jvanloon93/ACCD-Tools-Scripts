@@ -8,7 +8,7 @@ library(usmap)
 
 
 
-UN_LF_Pull <- function(county_fips, year) {
+UN_LF_County_Pull <- function(county_fips, year) {
   
   Unemployment_Codes <- as.vector(sapply(seq_along(county_fips), function(i) (paste('LAUCN',county_fips[i],'0000000004', sep = ""))))
   #Add Employment Section 
