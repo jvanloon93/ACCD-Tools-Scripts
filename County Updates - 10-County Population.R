@@ -25,3 +25,4 @@ ggplot(pop2, aes(x = County, y = Total_Population))+ geom_col() + theme(axis.tex
 
 v17concept <- v17 %>%
   count(concept)
+
