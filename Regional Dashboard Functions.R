@@ -2,6 +2,11 @@ library(tidycensus)
 library(blscrapeR)
 library(tidyverse)
 library(usmap)
+library(XLConnect)
+library(XLConnectJars)
+library(rJava)
+
+#Check API before running, US only functions are funky
 
 Profile_UR_LF <- function(year, month_code){
   
@@ -19,11 +24,11 @@ Profile_UR_LF <- function(year, month_code){
     filter(year == year & period == month_code | year == (year - 1) & period == month_code) %>%
     group_by(year) %>%
     summarise(sum(value)) %>%
-    mutate(month = "M03", Geography = 'Pittsburgh_Region') %>%
+    mutate(month = month_code, Geography = 'Pittsburgh_Region') %>%
     rename(Unemployment = 'sum(value)')
   
   LF_Filter <- df_LF %>%
-    filter(year == 2019 & period == month_code | year == (year - 1) & period == month_code) %>%
+    filter(year == year & period == month_code | year == (year - 1) & period == month_code) %>%
     group_by(year) %>%
     summarise(sum(value)) %>%
     rename(Labor_Force = 'sum(value)')
@@ -33,13 +38,13 @@ Profile_UR_LF <- function(year, month_code){
     mutate(Unemployment_Rate = Unemployment / Labor_Force)
   
   USUN <- quick_unemp_level() %>%
-    filter(year == 2019 & period == month_code | year == (year - 1) & period == month_code) %>%
+    filter(year == year & period == month_code | year == (year - 1) & period == month_code) %>%
     mutate(Geography = "Nation") %>%
     rename(Unemployment = "value", month = period) %>%
     select(year, month, Geography, Unemployment)
   
   USLF <- quick_laborForce_level() %>%
-    filter(year == 2019 & period == month_code | year == (year - 1) & period == month_code) %>%
+    filter(year == year & period == month_code | year == (year - 1) & period == month_code) %>%
     rename(Labor_Force = "value") %>%
     select(Labor_Force)
   
@@ -144,14 +149,6 @@ USA_qrtly <- function(year, quarter) {
   
 }
 
-Previous_year_Annual_Wage <- function(df) {
-  emp <- mean(unname(unlist(df[1:4, 3:5])))
-  
-  wage <- sum(df$Wage)
-  
-  return(wage/emp)
-}
-
 USA_qrtly <- function(year, quarter) {
   
   df <- qcew_api(year = year, qtr = quarter, slice = "area", sliceCode = "US000")
@@ -165,6 +162,49 @@ USA_qrtly <- function(year, quarter) {
   
 }
 
-PRAdf <- bind_rows(PRA_10_County_qtrly(2019, 1), PRA_10_County_qtrly(2018, 4), PRA_10_County_qtrly(2018, 3), PRA_10_County_qtrly(2018, 2))
+Previous_year_Annual_Wage <- function(df) {
+  emp <- mean(unname(unlist(df[1:4, 3:5])))
+  
+  wage <- sum(df$Wage)
+  
+  return(wage/emp)
+}
 
-USAdf <- bind_rows(USA_qrtly(2019, 1), USA_qrtly(2018,4), USA_qrtly(2018, 3), USA_qrtly(2018, 2))
+UR_LF <- Profile_UR_LF(2019, "M06")
+
+UR_LF <- Profile_UR_LF(2019, "M06")
+
+High_wage <- Profile_High_Wage(2019, "M06")
+
+PRAdf <- bind_rows(PRA_10_County_qtrly(2019, 2), PRA_10_County_qtrly(2019, 1), PRA_10_County_qtrly(2018, 4), PRA_10_County_qtrly(2018, 3))
+
+USAdf <- bind_rows(USA_qrtly(2019, 2), USA_qrtly(2019, 1), USA_qrtly(2018, 4), USA_qrtly(2018, 3))
+
+Previous_year_Annual_Wage(PRAdf)
+
+Previous_year_Annual_Wage(USAdf)
+
+book <- loadWorkbook("Regional_Dashboard.xlsx", create = TRUE)
+
+createSheet(book, "Unemployment & LaborForce")
+
+createSheet(book, "Unemployment & LaborForce 2018")
+
+createSheet(book, "High Wage")
+
+createSheet(book, "PRA Previous Wage")
+
+createSheet(book, "USA Previous Wage")
+
+writeWorksheet(book, UR_LF, "Unemployment & LaborForce")
+
+writeWorksheet(book, High_wage, "High Wage")
+
+writeWorksheet(book, PRAdf, "PRA Previous Wage")
+
+writeWorksheet(book, USAdf, "USA Previous Wage")
+
+
+
+
+

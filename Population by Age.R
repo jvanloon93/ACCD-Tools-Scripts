@@ -4,6 +4,9 @@ library(blscrapeR)
 library(tidyverse)
 library(usmap)
 library(reshape2)
+library(XLConnect)
+library(XLConnectJars)
+library(rJava)
 
 
 Pop_by_age <- function(year) {
@@ -67,4 +70,23 @@ return(lst)
 }
 
 lst <- Pop_by_age(2018)
+
+bk <- loadWorkbook("Pop_by_age.xlsx", create = TRUE)
+
+createSheet(bk, "Nation")
+
+createSheet(bk, "PA")
+
+createSheet(bk, "Counties")
+
+createSheet(bk, "City")
+
+writeWorksheet(bk, lst$Nation, "Nation")
+
+writeWorksheet(bk, lst$PA, "PA")
+
+writeWorksheet(bk, lst$Counties, "Counties")
+
+writeWorksheet(bk, lst$City, "City")
+
 
