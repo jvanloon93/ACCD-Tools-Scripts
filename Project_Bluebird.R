@@ -439,3 +439,10 @@ dfn <- dfn %>%
 createSheet(book, "National Demographics")
 
 writeWorksheet(book, dfn, "National Demographics")
+
+#Fun with Stats
+
+lm(Unemployment_Rate ~ Bach_Percentage + State, df)
+
+ggplot(df, aes(Bach_Percentage, Unemployment_Rate, color = State)) + geom_point()
+

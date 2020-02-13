@@ -33,4 +33,4 @@ oes <- gather(oes, "Measure", "value", 3:5) %>%
 oes <- oes %>% select(OCC_TITLE, Nation_TOT_EMP, Nation_A_MEAN, `Pittsburgh, PA_TOT_EMP`, `Pittsburgh, PA_A_MEAN`, `Pittsburgh, PA_LOC.QUOTIENT`,
                       `Cleveland-Elyria, OH_TOT_EMP`, `Cleveland-Elyria, OH_A_MEAN`, `Cleveland-Elyria, OH_LOC.QUOTIENT`, `Columbus, OH_TOT_EMP`, `Columbus, OH_A_MEAN`, `Columbus, OH_LOC.QUOTIENT`)
 
-write.csv(oes, file = "oes.csv")
+write.csv(oes, file = "oes2.csv")
